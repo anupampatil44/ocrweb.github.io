@@ -26,7 +26,74 @@
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+<style>
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid blue;
+  border-right: 16px solid green;
+  border-bottom: 16px solid red;
+  width: 45px;
+  height: 45px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
 
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* The snackbar - position it at the bottom and in the middle of the screen */
+#snackbar {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: #333; /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 2px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the snackbar */
+  bottom: 30px; /* 30px from the bottom */
+}
+
+/* Show the snackbar when clicking on a button (class added with JavaScript) */
+#snackbar.show {
+  visibility: visible; /* Show the snackbar */
+  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+</style>
 
 </head>
 
@@ -89,8 +156,9 @@
         <div class="col-lg-4 pt-5 pt-lg-0 order-2 order-lg-1 d-flex flex-column justify-content-center" data-aos="fade-up">
           <form class="form-inline">
             <div>
-              <input id="text" class="form-control" type="text" id="copyTarget" placeholder="Text to Copy">
-              <button type="button" class="btn btn-primary" id="copyButton">Copy</button><br><br>
+              <div><input id="text" class="form-control" type="text" id="copyTarget" placeholder="Text to Copy"> </div>
+              <br>
+              <div><button type="button" style="float: left;" class="btn btn-primary" id="copyButton">Copy</button><div style="float:right" id="loader" class=""></div></div>
             </div>
             </form>
           </div>
@@ -98,14 +166,14 @@
           <div>
             <div id="my_camera" style="width: 640px; height: 480px;">
             </div> <br><br>
-            <button type="button" class="btn btn-primary" id="button">Take Image</button><br><br>
+            <button type="button" class="btn btn-primary" id="click">Take Image for OCR</button><br><br>
             <div id="img"></div>
             <input id="process" width="500" height="375"></input>
           </div>
         </div>
       </div>
     </div>
-
+<div id="snackbar"></div>
   </section><!-- End Hero -->
 
   
@@ -147,7 +215,8 @@
   // take snapshot and get image data
     var d;
     var dataURI;
-	$("button").click(function() {
+	$("#click").click(function() {
+	  $("#loader").addClass("loader");
       Webcam.snap(function (data_uri) {
         document.getElementById('process').innerHTML =
                 '<img src="' + data_uri + '"/>';
@@ -178,7 +247,7 @@
           const data = JSON.stringify({
           "url": jx.data.url
         });
-  console.log("here")
+
         const xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
 
@@ -200,6 +269,19 @@
       }
 	  console.log(s);
 		//console.log(this.responseText);
+            if(s=="")
+            {
+              $("#loader").removeClass("loader");
+              document.getElementById("snackbar").innerHTML="No text detected, please try repositioning the document.";
+               var x = document.getElementById("snackbar");
+
+              // Add the "show" class to DIV
+              x.className = "show";
+
+          // After 3 seconds, remove the show class from DIV
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            }
+            $("#loader").removeClass("loader");
 		$("#text").val(s);
           }
         });
@@ -246,6 +328,15 @@
 
       function copyToClipboard(elem) {
         // create hidden text element, if it doesn't already exist
+      document.getElementById("snackbar").innerHTML="Text Copied Successfully!!";
+        var x = document.getElementById("snackbar");
+
+  // Add the "show" class to DIV
+  x.className = "show";
+
+  // After 3 seconds, remove the show class from DIV
+  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+
         var targetId = "_hiddenCopyText_";
         var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
         var origSelectionStart, origSelectionEnd;
