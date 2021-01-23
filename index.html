@@ -231,8 +231,6 @@
             <div id="my_camera" style="width: 640px; height: 480px;">
             </div> <br><br>
             <button type="button" class="btn btn-primary" id="click">Take Image for OCR</button><br><br>
-            <div id="img"></div>
-            <input id="process" width="500" height="375"></input>
           </div>
         </div>
       </div>
@@ -282,11 +280,7 @@
 	$("#click").click(function() {
 	  $("#loader").addClass("loader");
       Webcam.snap(function (data_uri) {
-        document.getElementById('process').innerHTML =
-                '<img src="' + data_uri + '"/>';
           var blob=dataURItoBlob(data_uri);
-          var file = document.getElementById('process');
-        //file.src=data_uri;
         var form = new FormData();
         form.append("image", blob)
         console.log(blob)
