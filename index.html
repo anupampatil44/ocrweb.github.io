@@ -27,6 +27,63 @@
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
 <style>
+/* Popup container - can be anything you want */
+.popup {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+  visibility: hidden;
+  width: 160px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -80px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
 .loader {
   border: 16px solid #f3f3f3;
   border-radius: 50%;
@@ -158,7 +215,14 @@
             <div>
               <div><input id="text" class="form-control" type="text" id="copyTarget" placeholder="Text to Copy"> </div>
               <br>
-              <div><button type="button" style="float: left;" class="btn btn-primary" id="copyButton">Copy</button><div style="float:right" id="loader" class=""></div></div>
+              <div>
+                <div class="popup">
+                <button type="button" style="float: left;" class="btn btn-primary" id="copyButton">Copy</button>
+                  <span class="popuptext" id="myPopup">Text Copied!</span>
+                </div>
+                <div style="float:right" id="loader" class="">
+                </div>
+              </div>
             </div>
             </form>
           </div>
@@ -326,64 +390,21 @@
 
 }
 
-      function copyToClipboard(elem) {
-        // create hidden text element, if it doesn't already exist
-      document.getElementById("snackbar").innerHTML="Text Copied Successfully!!";
-        var x = document.getElementById("snackbar");
+      $("#copyButton").click(function() {
+        var copyText = document.getElementById("text");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+ var popup = document.getElementById("myPopup");
+popup.classList.toggle("show");
+  setTimeout(function(){ popup.classList.toggle("show"); }, 800);
 
-  // Add the "show" class to DIV
-  x.className = "show";
+});
 
-  // After 3 seconds, remove the show class from DIV
-  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
 
-        var targetId = "_hiddenCopyText_";
-        var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
-        var origSelectionStart, origSelectionEnd;
-        if (isInput) {
-          // can just use the original source element for the selection and copy
-          target = elem;
-          origSelectionStart = elem.selectionStart;
-          origSelectionEnd = elem.selectionEnd;
-        } else {
-          // must use a temporary form element for the selection and copy
-          target = document.getElementById(targetId);
-          if (!target) {
-            var target = document.createElement("textarea");
-            target.style.position = "absolute";
-            target.style.left = "-9999px";
-            target.style.top = "0";
-            target.id = targetId;
-            document.body.appendChild(target);
-          }
-          target.textContent = elem.textContent;
-        }
-        // select the content
-        var currentFocus = document.activeElement;
-        target.focus();
-        target.setSelectionRange(0, target.value.length);
 
-        // copy the selection
-        var succeed;
-        try {
-          succeed = document.execCommand("copy");
-        } catch (e) {
-          succeed = false;
-        }
-        // restore original focus
-        if (currentFocus && typeof currentFocus.focus === "function") {
-          currentFocus.focus();
-        }
 
-        if (isInput) {
-          // restore prior selection
-          elem.setSelectionRange(origSelectionStart, origSelectionEnd);
-        } else {
-          // clear temporary content
-          target.textContent = "";
-        }
-        return succeed;
-      }
+
 
   </script>
 
